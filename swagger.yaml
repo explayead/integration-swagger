@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
-  title: Explay - API 0.3.0
-  version: 0.3.0
+  title: Explay - API
+  version: 0.5.2
   description: |-
     Especificações para integração com a API da plataforma Explay
   contact:
@@ -72,6 +72,8 @@ paths:
                   - id_user: 1
                     name_user: Administrador
                     email: admin@elydi.com
+                    document: 00000000000
+                    document_type: 1
                     updated_at: '2023-11-09 23:54:13'
                     created_at: '2023-11-09 23:54:13'
                   - ...
@@ -97,8 +99,9 @@ paths:
             example:
               name_user: Ricardo da Silva
               email: ricardo@example.com
+              document: 00000000000
+              document_type: 1
               custom_fields:
-                cpf: 000.000.000-00
                 telefone: (00) 00000-0000
       responses:
         '201':
@@ -147,9 +150,64 @@ paths:
             example:
               name_user: Ricardo Almeida
               email: ricardo-almeida@example.com
+              document: 00000000000
+              document_type: 1
               custom_fields:
-                cpf: 111.111.111-11
                 telefone: (11) 11111-1111
+      responses:
+        '200':
+          description: Sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserWithCustomField'
+        '401':
+          description: Unauthorized
+  /users/{id}/history:
+    get:
+      tags:
+        - User
+      summary: Visualiza histórico do usuário por ID
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: Sucesso
+          content:
+            application/json:
+              example:
+                - id_history: 1
+                  old_values: 
+                    email: "example@example.com"
+                    id_user: 58
+                    document: "00000000000"
+                    '': ...
+                  new_values: 
+                    email: "example-alterado@example.com"
+                    id_user: 58
+                    document: "00000000000"
+                    '': ...
+                  event: 1
+                  created_at: '2023-11-09 23:54:13'
+                - ...
+        '401':
+          description: Unauthorized
+  /users/{cpf}/upsert:
+    post:
+      tags:
+        - User
+      summary: Cria ou atualiza usuário pelo CPF(númeors apenas)
+      parameters:
+        - $ref: '#/components/parameters/cpf'
+      requestBody:
+        content:
+          application/json:
+            example:
+              name_user: Ricardo Almeida
+              email: ricardo-almeida@example.com
+              custom_fields:
+                telefone: (11) 11111-1111
+                "": ""...""
       responses:
         '200':
           description: Sucesso
@@ -324,6 +382,12 @@ components:
         email:
           type: string
           example: email@example.com
+        document:
+          type: string
+          example: 00000000000
+        document_type:
+          type: integer
+          example: 1
         created_at:
           type: string
           example: '2020-10-10 10:20:15'
@@ -361,11 +425,36 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/CustomFieldWithOptions'
+    HistoryUser:
+      type: object
+      properties:
+        id_history:
+          type: integer
+          format: int64
+          example: 10
+        old_values:
+          type: object
+        new_values:
+          type: object
+        event:
+          type: integer
+          example: 1
+          description: 1 para Criado 2 para Alterado
+        created_at:
+          type: string
+          example: '2020-10-10 10:20:15'
   parameters:
     id:
       name: id
       in: path
       description: id do usuário
+      required: true
+      schema:
+        type: string
+    cpf:
+      name: cpf
+      in: path
+      description: CPF do usuário (números apenas)
       required: true
       schema:
         type: string
