@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
-  title: Explay - API
-  version: 0.5.2
+  title: Explay - API 0.5.2
+  version: 0.3.0
   description: |-
     Especificações para integração com a API da plataforma Explay
   contact:
@@ -207,7 +207,7 @@ paths:
               email: ricardo-almeida@example.com
               custom_fields:
                 telefone: (11) 11111-1111
-                "": ""...""
+                "": "..."
       responses:
         '200':
           description: Sucesso
